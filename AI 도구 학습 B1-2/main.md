@@ -135,7 +135,7 @@
 |------|------------|------|
 | **Leonardo.ai** | GPT Image 2 / Dynamic / Low | AI 이미지 생성 |
 | **Hailuo** | 2.3 | 이미지 → 영상 변환 |
-| **TTS Maker** |  | 음성 나레이션 생성 |
+| **TTS Maker** | 507 - 🔥Junhyuk 준혁 | 음성 나레이션 생성 |
 
 ---
 
