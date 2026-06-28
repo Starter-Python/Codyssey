@@ -139,12 +139,15 @@
 
 ---
 
-## 💡 프롬프트 전략
+## 💡 프롬프트 전략 및 분석
 
 ### 🔄 씬 1 프롬프트 개선 과정
 
 #### ❌ 초기 프롬프트 (한국어 단순 입력)
-'흰티셔츠 입은 남자가 거리에 걷는 영상 만들어줘.'
+
+```
+흰티셔츠 입은 남자가 거리에 걷는 영상 만들어줘.
+```
 
 **문제점:**
 - 외국인 모델이 생성되어 무신사 스탠다드 광고 감성과 맞지 않음
@@ -164,9 +167,11 @@
 
 **② 제작 방식 변경**
 
+```
 ❌ 이전 방식: 텍스트 → 영상 직접 생성
-↓
+        ↓
 ✅ 개선 방식: 텍스트 → 이미지 생성 → 이미지 → 영상 변환
+```
 
 > 💡 **이미지 먼저 생성하는 방식으로 변경한 이유:**  
 > 이미지 단계에서 모델 외모, 의상, 배경을 먼저 확인하고  
@@ -175,7 +180,7 @@
 
 ---
 
-### 씬 1 - 이미지 프롬프트
+### 🖼️ 씬 1 - 이미지 프롬프트 분석 (GPT Image 2)
 
 ```
 Korean young male model,
@@ -184,12 +189,22 @@ walking on urban street, cinematic, natural lighting,
 full body shot, minimal style, foggy city background
 ```
 
-> **의도:** 무신사 스탠다드의 일상적이고 자연스러운 스타일링을 도심 배경으로 표현.
-> 안개낀 도시 분위기로 시네마틱한 무드 연출.
+| 단어/구문 | 의미 | 쓴 이유 |
+|-----------|------|---------|
+| `Korean young male model` | 한국인 젊은 남성 모델 | 초기 프롬프트에서 외국인이 나왔기 때문에 **국적을 명시**해서 무신사 타겟(20대 한국 남성)에 맞는 모델 생성 |
+| `white oversized t-shirt` | 흰 오버핏 티셔츠 | 무신사 스탠다드의 **대표 상품**을 직접 명시 |
+| `beige wide pants` | 베이지 와이드 팬츠 | 브랜드 컬러톤(화이트+베이지)에 맞는 **하의 코디** 표현 |
+| `white sneakers` | 흰 스니커즈 | 미니멀 스타일 완성을 위한 **신발 디테일** 명시 |
+| `walking on urban street` | 도심 거리를 걷는 | 일상적인 자연스러운 무드 연출, **광고 스토리** 구현 |
+| `cinematic` | 영화같은 느낌 | 단순 사진이 아닌 **광고 느낌**의 고품질 이미지 유도 |
+| `natural lighting` | 자연광 | 인위적이지 않고 **일상적인 분위기** 표현 |
+| `full body shot` | 전신 샷 | 의상 전체가 보여야 하므로 **착용샷 목적**에 맞게 명시 |
+| `minimal style` | 미니멀 스타일 | 무신사 스탠다드 브랜드 아이덴티티 **"미니멀 베이직"** 반영 |
+| `foggy city background` | 안개낀 도시 배경 | 배경이 너무 선명하면 모델에 집중이 안되므로 **시네마틱한 분위기** 연출 |
 
 ---
 
-### 씬 2 - 이미지 프롬프트
+### 🖼️ 씬 2 - 이미지 프롬프트 분석 (GPT Image 2)
 
 ```
 white oversized t-shirt flat lay,
@@ -198,12 +213,19 @@ brand name "MUSINSA STANDARD" text below,
 clean product shot, studio lighting, soft shadow
 ```
 
-> **의도:** 제품 자체의 깔끔함을 강조하는 미니멀 제품 컷.
-> 브랜드명을 하단에 배치해 광고 엔딩 씬으로 활용.
+| 단어/구문 | 의미 | 쓴 이유 |
+|-----------|------|---------|
+| `white oversized t-shirt flat lay` | 흰 오버핏 티셔츠 플랫레이 | 옷을 바닥에 펼쳐놓은 구도로 **제품 자체를 주인공**으로 만들기 위해 |
+| `pure white background` | 순백색 배경 | 제품에만 집중할 수 있도록 **배경을 완전히 제거** |
+| `minimal` | 미니멀 | 불필요한 요소 없이 **깔끔한 구성** 유지 |
+| `brand name "MUSINSA STANDARD" text below` | 하단에 브랜드명 텍스트 | 광고 엔딩 씬에 **브랜드 노출**을 위해 직접 텍스트 명시 |
+| `clean product shot` | 깔끔한 제품 컷 | 쇼핑몰/광고에서 쓰는 **제품 촬영 스타일** 유도 |
+| `studio lighting` | 스튜디오 조명 | 제품 색상과 형태가 정확히 보이도록 **균일한 조명** 설정 |
+| `soft shadow` | 부드러운 그림자 | 완전히 평면적이지 않고 **입체감**을 살리기 위해 |
 
 ---
 
-### 씬 1 - 영상 변환 프롬프트 (Hailuo 2.3)
+### 🎬 씬 1 - 영상 변환 프롬프트 분석 (Hailuo 2.3)
 
 ```
 person walking slowly forward,
@@ -211,7 +233,17 @@ cinematic camera movement, smooth natural motion,
 minimal style, soft lighting
 ```
 
-### 씬 2 - 영상 변환 프롬프트 (Hailuo 2.3)
+| 단어/구문 | 의미 | 쓴 이유 |
+|-----------|------|---------|
+| `person walking slowly forward` | 사람이 천천히 앞으로 걷는 | 이미지 속 모델이 **자연스럽게 걷는 동작**을 유도 |
+| `cinematic camera movement` | 영화같은 카메라 움직임 | 단순히 걷는 것이 아닌 **광고 느낌의 카메라 워크** 연출 |
+| `smooth natural motion` | 부드럽고 자연스러운 움직임 | AI 영상 특유의 **어색한 움직임 방지** |
+| `minimal style` | 미니멀 스타일 | 이미지와 **톤앤매너 일관성** 유지 |
+| `soft lighting` | 부드러운 조명 | 이미지의 자연광 분위기를 **영상에서도 유지** |
+
+---
+
+### 🎬 씬 2 - 영상 변환 프롬프트 분석 (Hailuo 2.3)
 
 ```
 slow zoom in on white clothing,
@@ -219,7 +251,20 @@ soft light, clean white background,
 cinematic product shot, minimal
 ```
 
+| 단어/구문 | 의미 | 쓴 이유 |
+|-----------|------|---------|
+| `slow zoom in on white clothing` | 흰 옷으로 천천히 줌인 | 광고 엔딩에서 **제품에 집중**시키는 연출 효과 |
+| `soft light` | 부드러운 빛 | 이미지의 스튜디오 조명 분위기를 **영상에서도 유지** |
+| `clean white background` | 깔끔한 흰 배경 | 이미지와 **배경 일관성** 유지 |
+| `cinematic product shot` | 시네마틱 제품 컷 | 단순 정지가 아닌 **광고스러운 영상미** 연출 |
+| `minimal` | 미니멀 | 전체 광고의 **톤앤매너 통일** |
+
 ---
+
+> 💡 **핵심 전략 요약**
+> - 이미지 프롬프트: **무엇을, 어떻게 보여줄지** 구체적으로 명시
+> - 영상 프롬프트: 이미지와 **톤앤매너를 유지**하면서 **어떻게 움직일지**에 집중
+
 
 ## 📁 산출물 목록
 
