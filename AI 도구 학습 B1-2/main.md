@@ -190,9 +190,10 @@ cinematic product shot, minimal
 
 ```
 📂 AI 도구 학습 B1-2/               
-├── 📄 storyboard.md             ← 스토리보드 기획 문서
-├── 🖼️  scene1.png                ← 씬 1 AI 생성 이미지
-├── 🖼️  scene2.png                ← 씬 2 AI 생성 이미지
+├── 📄 main.md                  ← 프로젝트 설명 (현재 파일)
+├── 📄 storyboard.pdf             ← 스토리보드 기획 문서
+├── 🖼️ scene1.png                ← 씬 1 AI 생성 이미지
+├── 🖼️ scene2.png                ← 씬 2 AI 생성 이미지
 ├── 🎬 scene1.mp4                 ← 씬 1 영상 (0~6초)
 ├── 🎬 scene2.mp4                 ← 씬 2 영상 (6~12초)
 ```
