@@ -1,0 +1,209 @@
+# ESL 대진 자동 생성 알고리즘
+# ------------------------------------------------------
+# 이 코드는 스쿼시 동아리 ESL(리그전) 대진을 자동으로 짜주는 핵심 로직입니다.
+# 규칙 요약:
+#   1. 1부/2부 리그는 완전히 분리해서 따로 대진을 짠다.
+#   2. 같은 반기(전반기/후반기) 안에서는 같은 상대와 두 번 안 만난다.
+#   3. 하루에 한 사람이 뛸 수 있는 경기는 최대 2경기.
+#   4. 이번 반기 경기수가 적은 사람을 우선적으로 배정한다.
+#   5. 티어 차이당 +2점, 여자가 남자와 붙으면 여자에게 +2점 보너스를 준다.
+#
+# 이 파일은 "알고리즘 로직"만 들어있어요. Notion 연동, 카톡 파싱(AI) 같은
+# 다른 부분은 이 함수를 "도구(tool)"로 가져다 쓰는 식으로 나중에 연결하면 됩니다.
+
+
+# ----------------------------
+# 1. 데이터 구조 정의
+# ----------------------------
+
+class Player:
+    """선수 한 명의 정보를 담는 객체"""
+    def __init__(self, name, league, tier, gender, half_games_count):
+        self.name = name                      # 이름
+        self.league = league                  # "1부" 또는 "2부"
+        self.tier = tier                      # 티어 (숫자, 작을수록 상위 티어라고 가정)
+        self.gender = gender                  # "남" 또는 "여"
+        self.half_games_count = half_games_count  # 이번 반기에 이미 뛴 경기 수 (DB에서 조회한 값)
+        self.today_games_count = 0            # 오늘 배정된 경기 수 (시작은 0)
+
+
+# ----------------------------
+# 2. 점수(어드밴티지) 계산 함수
+# ----------------------------
+
+def calculate_bonus(player_a, player_b):
+    """
+    두 선수가 붙었을 때, 각자에게 줄 보너스 점수를 계산합니다.
+    반환값: (player_a에게 줄 보너스, player_b에게 줄 보너스)
+    """
+    bonus_a = 0
+    bonus_b = 0
+
+    # 규칙: 같은 리그(시드) 안에서 티어가 다르면, 티어 차이당 +2점을
+    # "더 낮은 티어(약한 쪽)"에게 준다고 가정합니다.
+    tier_diff = abs(player_a.tier - player_b.tier)
+    if tier_diff > 0:
+        tier_points = tier_diff * 2
+        if player_a.tier > player_b.tier:
+            # 숫자가 클수록 하위 티어라고 가정 -> player_a가 약자
+            bonus_a += tier_points
+        else:
+            bonus_b += tier_points
+
+    # 규칙: 여자가 남자와 경기하면 여자에게 +2점
+    if player_a.gender == "여" and player_b.gender == "남":
+        bonus_a += 2
+    elif player_b.gender == "여" and player_a.gender == "남":
+        bonus_b += 2
+
+    return bonus_a, bonus_b
+
+
+# ----------------------------
+# 3. 대진 생성 핵심 함수
+# ----------------------------
+
+def calculate_daily_capacity(attendees, max_cap=8):
+    """
+    오늘 참여 인원수를 기반으로 가능한 최대 경기수를 자동 계산합니다.
+
+    원리: 한 사람이 하루 최대 2경기까지 가능 -> 전체 "출전 슬롯" = 참여인원 x 2개
+          경기 1개당 슬롯 2개를 쓰니까, 이론상 최대 경기수 = 참여인원 수
+          단, max_cap(기본 8경기)을 넘기지 않도록 제한
+    """
+    theoretical_max = len(attendees)
+    return min(theoretical_max, max_cap)
+
+
+def generate_matches_for_league(attendees, played_pairs_this_half, daily_capacity=None):
+    """
+    한 리그(1부 또는 2부)에 대해서만 오늘의 대진을 생성합니다.
+
+    attendees: 오늘 참여하는 Player 객체 리스트 (해당 리그 인원만)
+    played_pairs_this_half: 이번 반기에 이미 붙어본 상대 쌍의 집합
+                             예: {frozenset({"김민수", "이지은"}), ...}
+    daily_capacity: 오늘 가능한 총 경기 수 (사람이 직접 입력)
+
+    반환값: 매치 리스트. 각 매치는 dict 형태
+            {"player_a": 이름, "player_b": 이름, "bonus_a": 점수, "bonus_b": 점수}
+    """
+    # daily_capacity를 안 정해주면 참여 인원 기준으로 자동 계산 (최대 8경기)
+    if daily_capacity is None:
+        daily_capacity = calculate_daily_capacity(attendees)
+
+    matches = []
+    # 매치를 만들 때마다 played_pairs_this_half에 추가해서 중복 방지
+    played_pairs = set(played_pairs_this_half)
+
+    while len(matches) < daily_capacity:
+        # 1) 오늘 2경기 안 채운 사람들만 추리기
+        available = [p for p in attendees if p.today_games_count < 2]
+        if len(available) < 2:
+            break  # 짝지을 수 있는 사람이 1명 이하면 더 이상 진행 불가
+
+        # 2) 이번 반기 경기수가 적은 순으로 정렬 (우선순위 정렬)
+        available.sort(key=lambda p: p.half_games_count)
+
+        matched_this_round = False
+
+        # 3) 경기수가 적은 사람부터 순서대로 짝을 찾는다
+        for player_a in available:
+            # player_a와 짝지을 수 있는 후보 찾기
+            candidates = []
+            for player_b in available:
+                if player_a is player_b:
+                    continue
+                # 이번 반기에 이미 붙어본 상대면 제외
+                pair_key = frozenset({player_a.name, player_b.name})
+                if pair_key in played_pairs:
+                    continue
+                candidates.append(player_b)
+
+            if not candidates:
+                continue  # player_a는 오늘 더 이상 짝지을 상대가 없음 -> 다음 사람 시도
+
+            # 후보 중에서도 경기수가 가장 적은 사람을 우선 선택
+            candidates.sort(key=lambda p: p.half_games_count)
+            player_b = candidates[0]
+
+            # 매치 확정
+            pair_key = frozenset({player_a.name, player_b.name})
+            played_pairs.add(pair_key)
+            player_a.today_games_count += 1
+            player_b.today_games_count += 1
+            player_a.half_games_count += 1
+            player_b.half_games_count += 1
+
+            bonus_a, bonus_b = calculate_bonus(player_a, player_b)
+            matches.append({
+                "player_a": player_a.name,
+                "player_b": player_b.name,
+                "bonus_a": bonus_a,
+                "bonus_b": bonus_b,
+            })
+
+            matched_this_round = True
+            break  # 한 쌍 매칭했으면 처음부터 다시 우선순위 정렬해서 진행
+
+        if not matched_this_round:
+            # 이번 라운드에 아무도 짝을 못 찾았다면 더 진행해도 의미 없음
+            break
+
+    return matches
+
+
+def generate_today_matches(all_attendees, played_pairs_this_half, daily_capacity_by_league=None):
+    """
+    전체 참가자(1부+2부 섞여있음)를 리그별로 나눠서 각각 대진을 생성합니다.
+
+    all_attendees: 오늘 참여하는 모든 Player 객체 리스트
+    played_pairs_this_half: {"1부": set(...), "2부": set(...)} 형태
+    daily_capacity_by_league: {"1부": 6, "2부": 4} 처럼 리그별 가능 경기수를
+                               직접 지정할 수도 있고, 생략하면(None) 참여 인원
+                               기준으로 자동 계산됩니다 (최대 8경기).
+
+    반환값: {"1부": [매치들], "2부": [매치들]}
+    """
+    result = {}
+    leagues = set(p.league for p in all_attendees)
+    daily_capacity_by_league = daily_capacity_by_league or {}
+
+    for league in leagues:
+        league_attendees = [p for p in all_attendees if p.league == league]
+        pairs_history = played_pairs_this_half.get(league, set())
+        capacity = daily_capacity_by_league.get(league)  # 없으면 None -> 자동 계산
+
+        matches = generate_matches_for_league(league_attendees, pairs_history, capacity)
+        result[league] = matches
+
+    return result
+
+
+# ----------------------------
+# 4. 사용 예시 (이렇게 호출하면 됩니다)
+# ----------------------------
+
+if __name__ == "__main__":
+    # 예시: 1부 리그 참가자 6명, 오늘 가능 경기수는 자동 계산 (6명 -> 최대 6경기, 8 안 넘으므로 6경기)
+    attendees = [
+        Player("김민수", "1부", tier=1, gender="남", half_games_count=2),
+        Player("이지은", "1부", tier=2, gender="여", half_games_count=1),
+        Player("박철수", "1부", tier=1, gender="남", half_games_count=4),
+        Player("최영희", "1부", tier=3, gender="여", half_games_count=0),
+        Player("정우성", "1부", tier=2, gender="남", half_games_count=3),
+        Player("한소희", "1부", tier=1, gender="여", half_games_count=2),
+    ]
+
+    # 이번 반기에 이미 붙어본 상대들 (예시: 아직 아무도 안 붙어봤다고 가정)
+    # 주의: 이 목록은 "결과가 보고되어 DB에 확정된" 상대만 들어가야 합니다.
+    #       대진만 짜이고 결과가 보고 안 된 경기는 여기 추가하면 안 됩니다 (= 없던 경기 취급).
+    played_pairs_this_half = {"1부": set()}
+
+    # daily_capacity_by_league를 생략하면 참여 인원수 기준으로 자동 계산됩니다.
+    result = generate_today_matches(attendees, played_pairs_this_half)
+
+    print("=== 오늘의 대진표 ===")
+    for league, matches in result.items():
+        print(f"\n[{league}] (자동 계산된 경기수: {calculate_daily_capacity([p for p in attendees if p.league == league])}경기)")
+        for m in matches:
+            print(f"  {m['player_a']} (+{m['bonus_a']}점)  vs  {m['player_b']} (+{m['bonus_b']}점)")
