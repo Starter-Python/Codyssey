@@ -43,7 +43,7 @@
 | 해상도 | 1376×768 (768p) |
 
 **프롬프트 요약:**  
-`A young Korean male model walking naturally on a clean urban street, wearing minimalist beige outer jacket and straight-fit slacks, soft natural lighting, modern city background, fashion editorial style`
+`person walking slowly forward, cinematic camera movement, smooth natural motion, minimal style, soft lighting`
 
 ---
 
@@ -52,15 +52,15 @@
 | 항목 | 내용 |
 |------|------|
 | 장면 | 의상 디테일 클로즈업 후 브랜드 로고 페이드인 |
-| 의상 | 무신사 스탠다드 니트 + 데님 |
+| 의상 | 무신사 스탠다드 흰 티셔츠 |
 | 분위기 | 차분하고 세련된 스튜디오 감성 |
-| 카메라 | 상체 클로즈업 → 전신 샷 |
+| 카메라 | 티셔츠 클로즈업 |
 | 이미지 생성 | Leonardo.ai GPT Image 2 |
 | 영상 변환 | Hailuo 2.3 (6초) |
 | 해상도 | 1376×768 (768p) |
 
 **프롬프트 요약:**  
-`Close-up of a young Korean model wearing a simple gray knit sweater and straight denim pants, clean studio background, soft lighting, minimalist fashion photography style, high quality`
+`slow zoom in on white clothing, soft light, clean white background, cinematic product shot, minimal`
 
 ---
 
@@ -79,8 +79,8 @@
 
 | 씬 | 시간 | 장소 | 의상 | 분위기 | 도구 |
 |----|------|------|------|--------|------|
-| 씬 1 | 0~6초 | 도심 거리 | 베이직 아우터 + 슬랙스 | 밝고 자연스러운 도시 감성 | Leonardo + Hailuo |
-| 씬 2 | 6~12초 | 스튜디오 | 니트 + 데님 | 차분하고 세련된 감성 | Leonardo + Hailuo |
+| 씬 1 | 0~6초 | 도심 거리 | 흰 티셔츠 + 베이지 슬랙스 | 밝고 자연스러운 도시 감성 | Leonardo + Hailuo |
+| 씬 2 | 6~12초 | 스튜디오 | 흰 티셔츠 | 차분하고 세련된 감성 | Leonardo + Hailuo |
 
 ---
 
