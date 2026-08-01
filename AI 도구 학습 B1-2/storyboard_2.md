@@ -89,8 +89,7 @@
 | 이미지 생성 | Leonardo.ai GPT Image 2 (Dynamic / Low) | 씬별 키프레임 이미지 (1024×1024) |
 | 영상 변환 | Hailuo 2.3 | Image-to-Video 6초 클립 (1376×768) |
 | 내레이션 | TTS Maker (507 준혁) | AI 음성 카피 |
-| BGM | Suno | AI 배경음악 |
-| 편집/통합 | CapCut | 씬 연결, 자막, 오디오 믹싱 |
+| 편집/통합 | QuickTime Player | 씬 연결, 자막, 오디오 믹싱 |
 
 ---
 
@@ -107,17 +106,16 @@
 
 ## 📁 파일 네이밍 규칙
 
-`[프로젝트]_[씬번호]_[에셋타입]_[버전]` 형식
-
 ```
 📂 AI 도구 학습 B1-2/
-├── musinsa_s01_img_v2.png     ← 씬 1 이미지 (v2 = 프롬프트 수정 후)
-├── musinsa_s02_img_v1.png     ← 씬 2 이미지
-├── musinsa_s01_vid_v1.mp4     ← 씬 1 영상 (0~6초)
-├── musinsa_s02_vid_v1.mp4     ← 씬 2 영상 (6~12초)
-├── musinsa_narr_v1.mp3        ← 내레이션
-├── musinsa_bgm_v1.mp3         ← BGM
-└── musinsa_final_12s.mp4      ← 최종 통합본
+├── main.md
+├── scene0.mp4     ← 씬 0 영상
+├── scene1.mp4     ← 씬 1 영상 (0~6초)
+├── scene1.png     ← 씬 1 이미지
+├── scene2.mp4     ← 씬 2 영상 (6~12초)
+├── scene2.pnh     ← 씬 2 이미지
+├── storyboard.md       ← 스토리보드
+└── storyboard.pdf      
 ```
 
 ---
@@ -126,7 +124,7 @@
 
 - **직접 촬영 소스:** 사용 안 함 — 전 장면 AI 생성
 - **유료 스톡 소스:** 사용 안 함
-- 이미지(Leonardo.ai) / 영상(Hailuo 2.3) / 음성(TTS Maker) / 음악(Suno) **전부 AI 생성물**로만 구성
+- 이미지(Leonardo.ai) / 영상(Hailuo 2.3) / 음성(TTS Maker) **전부 AI 생성물**로만 구성
 
 ---
 
