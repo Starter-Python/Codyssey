@@ -1,0 +1,20 @@
+# 실제 API 키와 환경 설정
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# Python 가상환경·캐시
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# 로컬 IDE·운영체제 파일
+.vscode/
+.idea/
+.DS_Store
+
+# 과제 제출용으로 검증·비식별화한 실행 결과는 results/에 포함합니다.
+# 실제 운영 데이터에 민감한 정보가 있다면 커밋 전에 별도로 검토하세요.
