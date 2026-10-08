@@ -1,0 +1,32 @@
+[
+  {
+    "id": "E1",
+    "name": "E1",
+    "title": "E1 리그 (1부)",
+    "firstHalfMinimum": 9,
+    "secondHalfMinimum": 9,
+    "targetGames": 9,
+    "minRequired": 7,
+    "desc": "10명 풀리그 (전반 9 / 후반 9, 최소 7경기 출전)"
+  },
+  {
+    "id": "E2",
+    "name": "E2",
+    "title": "E2 리그 (2부)",
+    "firstHalfMinimum": 14,
+    "secondHalfMinimum": 14,
+    "targetGames": 14,
+    "minRequired": 7,
+    "desc": "15명 풀리그 (전반 14 / 후반 14, 최소 7경기 출전)"
+  },
+  {
+    "id": "E3",
+    "name": "E3",
+    "title": "E3 리그 (3부)",
+    "firstHalfMinimum": 7,
+    "secondHalfMinimum": 7,
+    "targetGames": 7,
+    "minRequired": 7,
+    "desc": "8명 풀리그 (전반 7 / 후반 7, 최소 7경기 출전)"
+  }
+]

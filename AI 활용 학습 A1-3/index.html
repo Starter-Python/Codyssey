@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ENTHES — 공식 스쿼시 리그 (ESL) & AI 코칭 스튜디오</title>
+  <meta name="description" content="스쿼시 동아리 ENTHES 정규 리그(ESL) 33인 공식 운영 시스템 및 Google Gemini 기반 실시간 경기 피드백 웹앱" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Header & Navigation -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-logo">🎾</span>
+        <div>
+          <h1 class="brand-title">ENTHES</h1>
+          <span class="brand-subtitle">ESL 정규 리그 &amp; AI 코치</span>
+        </div>
+      </div>
+
+      <nav class="main-nav" aria-label="메인 메뉴">
+        <button type="button" class="nav-btn active" data-tab="dashboard">🏠 홈</button>
+        <button type="button" class="nav-btn" data-tab="schedule">📅 대진</button>
+        <button type="button" class="nav-btn" data-tab="attendance">⚡ 참석</button>
+        <button type="button" class="nav-btn" data-tab="rankings">📊 순위·스탯</button>
+        <button type="button" class="nav-btn highlight" data-tab="ai-coach">✨ AI 분석</button>
+        <button type="button" class="nav-btn" data-tab="admin">⚙️ 운영진</button>
+      </nav>
+
+      <div class="header-actions">
+        <div class="user-select-wrap">
+          <label for="active-user-select" class="sr-only">내 이름 선택</label>
+          <select id="active-user-select" aria-label="내 이름 선택">
+            <option value="">👤 내 이름 선택</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="mobile-nav" aria-label="모바일 하단 메뉴">
+    <button type="button" class="m-nav-btn active" data-tab="dashboard">
+      <span class="m-icon">🏠</span>
+      <span class="m-label">홈</span>
+    </button>
+    <button type="button" class="m-nav-btn" data-tab="schedule">
+      <span class="m-icon">📅</span>
+      <span class="m-label">대진</span>
+    </button>
+    <button type="button" class="m-nav-btn" data-tab="attendance">
+      <span class="m-icon">⚡</span>
+      <span class="m-label">참석</span>
+    </button>
+    <button type="button" class="m-nav-btn" data-tab="rankings">
+      <span class="m-icon">📊</span>
+      <span class="m-label">순위</span>
+    </button>
+    <button type="button" class="m-nav-btn" data-tab="ai-coach">
+      <span class="m-icon">✨</span>
+      <span class="m-label">AI 코치</span>
+    </button>
+    <button type="button" class="m-nav-btn" data-tab="admin">
+      <span class="m-icon">⚙️</span>
+      <span class="m-label">운영</span>
+    </button>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="main-content">
+
+    <!-- TAB 1: 대시보드 (Dashboard) -->
+    <section id="tab-dashboard" class="tab-pane active">
+      <div class="hero-card">
+        <div class="hero-badge">2026 하반기 공식 33인 정규시즌</div>
+        <h2 class="hero-heading">스마트 스쿼시 리그와<br /><span class="text-gradient">실시간 AI 피드백</span>의 만남</h2>
+        <p class="hero-desc">E1·E2·E3 3개 리그 공정 자동 대진, 6대 스탯 레이더, 경기 결과 등록 즉시 산출되는 Gemini AI 코칭 리포트 및 성장 궤적을 확인하세요.</p>
+        
+        <div class="hero-actions">
+          <button type="button" class="btn btn-primary" onclick="switchTab('schedule')">📅 대진표 확인 &amp; 결과 입력</button>
+          <button type="button" class="btn btn-secondary" onclick="switchTab('rankings')">📊 33인 순위 &amp; 6축 스탯</button>
+          <a href="evidence/ENTHES_ESL_부원가이드.md" target="_blank" class="btn btn-outline" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: #fff;">📱 부원 이용 안내서 →</a>
+        </div>
+      </div>
+
+      <!-- Quick Stats Counters -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <span class="stat-label">공식 선수단</span>
+          <strong class="stat-value" id="stat-total-players">33<small>명</small></strong>
+          <span class="stat-meta">E1 10 · E2 15 · E3 8</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">확정된 경기</span>
+          <strong class="stat-value" id="stat-total-matches">0<small>경기</small></strong>
+          <span class="stat-meta">실시간 스탯 집계 완료</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">오늘 참석 예정</span>
+          <strong class="stat-value" id="stat-today-attending">0<small>명</small></strong>
+          <span class="stat-meta">출석 체크 기반 대진</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">AI 코칭 리포트</span>
+          <strong class="stat-value text-emerald" id="stat-ai-reports">0<small>건</small></strong>
+          <span class="stat-meta">Gemini 코칭 진단</span>
+        </div>
+      </div>
+
+      <!-- Dashboard Match Row -->
+      <div class="two-col-grid">
+        <div class="panel-card">
+          <div class="panel-header">
+            <h3>📅 진행 예정 대진</h3>
+            <button type="button" class="link-btn" onclick="switchTab('schedule')">전체 대진 →</button>
+          </div>
+          <div id="dash-today-matches" class="match-list-compact"></div>
+        </div>
+
+        <div class="panel-card">
+          <div class="panel-header">
+            <h3>🏆 최근 확정 결과</h3>
+            <button type="button" class="link-btn" onclick="switchTab('rankings')">순위표 →</button>
+          </div>
+          <div id="dash-recent-results" class="match-list-compact"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: 대진 일정 (Schedule) -->
+    <section id="tab-schedule" class="tab-pane">
+      <div class="section-title-wrap">
+        <div>
+          <h2>ESL 정규 경기 대진표</h2>
+          <p>핸디캡 어드밴티지, 서브권, 코트 및 자율 심판이 배정됩니다. 경기 후 <strong>[결과 입력 &amp; AI 분석]</strong>을 터치해 점수와 메모를 등록하세요.</p>
+        </div>
+        <div class="filter-controls">
+          <select id="schedule-league-filter" class="select-input">
+            <option value="전체">모든 리그</option>
+            <option value="E1">E1 리그 (1부)</option>
+            <option value="E2">E2 리그 (2부)</option>
+            <option value="E3">E3 리그 (3부)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="rules-callout">
+        <strong>⚡ 2026 하반기 ESL 핸디캡 &amp; 서브권 공식 규정</strong>
+        <ul>
+          <li><strong>티어 핸디캡:</strong> 티어 차이당 2점 어드밴티지 (예: 1티어 vs 2티어 ➔ 2티어 선수 +2점 시작)</li>
+          <li><strong>서브권:</strong> 하위 티어 선수에게 1세트 우선 서브권 부여 (동티어 시 가위바위보)</li>
+          <li><strong>최소 출전:</strong> 리그별 최소 7경기 필수 출전 (E1 18경기, E2 28경기, E3 14경기 체제)</li>
+          <li><strong>자율 심판:</strong> 공정성을 위해 같은 시간대 비경기 선수 2명이 자동 배정됩니다.</li>
+        </ul>
+      </div>
+
+      <div id="schedule-match-list" class="match-card-grid"></div>
+    </section>
+
+    <!-- TAB 3: 참석 체크 (Attendance) -->
+    <section id="tab-attendance" class="tab-pane">
+      <div class="section-title-wrap">
+        <div>
+          <h2>정기 모임 참석 체크</h2>
+          <p>월·목 정기 운동 참석 여부를 체크해주세요. 운영진이 이를 바탕으로 공정한 맞춤 대진을 편성합니다.</p>
+        </div>
+      </div>
+
+      <div class="attendance-container">
+        <div class="attendance-form-card">
+          <h3>⚡ 내 참석 상태 기록</h3>
+          
+          <div class="form-group">
+            <label for="att-date-input">경기 날짜</label>
+            <input type="date" id="att-date-input" class="form-control" />
+          </div>
+
+          <div class="form-group">
+            <label for="att-player-select">선수 이름 선택</label>
+            <select id="att-player-select" class="form-control">
+              <option value="">선수를 선택하세요</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>참석 상태</label>
+            <div class="status-btn-group">
+              <button type="button" class="status-btn active-attending" data-status="attending">
+                <span class="dot green"></span> 참석
+              </button>
+              <button type="button" class="status-btn" data-status="absent">
+                <span class="dot red"></span> 불참
+              </button>
+              <button type="button" class="status-btn" data-status="waitlist">
+                <span class="dot gray"></span> 미정/대기
+              </button>
+            </div>
+          </div>
+
+          <button type="button" id="att-save-btn" class="btn btn-primary btn-block">참석 상태 저장하기</button>
+          <div id="att-feedback-msg" class="feedback-msg"></div>
+        </div>
+
+        <div class="attendance-roster-card">
+          <div class="roster-header">
+            <h3>📋 <span id="att-selected-date-label">오늘</span>의 출석 현황</h3>
+            <span class="badge badge-emerald" id="att-count-badge">참석 0명</span>
+          </div>
+
+          <div class="league-roster-section">
+            <h4>E1 리그 (1부)</h4>
+            <div id="roster-league-1" class="chip-container"></div>
+
+            <h4>E2 리그 (2부)</h4>
+            <div id="roster-league-2" class="chip-container"></div>
+
+            <h4>E3 리그 (3부)</h4>
+            <div id="roster-league-3" class="chip-container"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: 순위 및 6축 스탯 (Rankings & Radar) -->
+    <section id="tab-rankings" class="tab-pane">
+      <div class="section-title-wrap">
+        <div>
+          <h2>선수단 순위 &amp; 6축 스탯 레이더</h2>
+          <p>선수 이름을 클릭하면 포핸드·백핸드·공격옵션·스피드·체력·침착성 6대 역량 차트와 AI 성장 궤적을 조회할 수 있습니다.</p>
+        </div>
+        <div class="league-tab-group">
+          <button type="button" class="sub-tab-btn active" data-league="E1">E1 리그 (10명)</button>
+          <button type="button" class="sub-tab-btn" data-league="E2">E2 리그 (15명)</button>
+          <button type="button" class="sub-tab-btn" data-league="E3">E3 리그 (8명)</button>
+        </div>
+      </div>
+
+      <div class="rankings-layout">
+        <div class="table-responsive">
+          <table class="ranking-table">
+            <thead>
+              <tr>
+                <th>순위</th>
+                <th>선수명</th>
+                <th>티어</th>
+                <th>OVR</th>
+                <th>경기수</th>
+                <th>승 / 패</th>
+                <th>승률</th>
+                <th>스탯</th>
+              </tr>
+            </thead>
+            <tbody id="ranking-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- Player Profile Panel -->
+        <div class="player-detail-card" id="player-profile-panel">
+          <div class="profile-header">
+            <div>
+              <span class="profile-tier-badge" id="prof-tier">T1</span>
+              <h3 id="prof-name">임영현</h3>
+              <span class="profile-league-tag" id="prof-league">E1 리그</span>
+            </div>
+            <div class="ovr-circle">
+              <span class="ovr-num" id="prof-ovr">86</span>
+              <span class="ovr-lbl">OVR</span>
+            </div>
+          </div>
+
+          <!-- Archetype Badge -->
+          <div class="archetype-badge-wrap">
+            <span class="archetype-badge" id="prof-archetype-badge">👑 구석 찌르기 장인</span>
+          </div>
+
+          <!-- Pure SVG Radar Chart -->
+          <div class="radar-wrap">
+            <svg id="radar-svg" viewBox="0 0 300 300" class="radar-chart" width="100%" height="240"></svg>
+          </div>
+
+          <!-- 6 Stat Bars -->
+          <div class="stat-bars-grid" id="prof-stat-bars"></div>
+
+          <!-- AI Diagnosis Card -->
+          <div class="profile-ai-note">
+            <strong>🤖 수석 코치 AI 정밀 진단</strong>
+            <p id="prof-ai-summary">공을 구석 깊숙이 길게 보내 상대방을 코트 뒤로 밀어내는 플레이가 최고입니다.</p>
+            <div class="diagnosis-lists">
+              <div>
+                <span class="diag-sub-title">강점 요인</span>
+                <ul id="prof-strengths-list" class="diag-list"></ul>
+              </div>
+              <div style="margin-top: 0.5rem;">
+                <span class="diag-sub-title">추천 드릴</span>
+                <ul id="prof-drills-list" class="diag-list"></ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Growth Timeline -->
+          <div class="growth-timeline-card">
+            <strong>📈 OVR 성장 궤적</strong>
+            <div id="prof-growth-timeline" class="timeline-container"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: AI 코칭 스튜디오 (AI Coach Simulator) -->
+    <section id="tab-ai-coach" class="tab-pane">
+      <div class="ai-hero-header">
+        <div class="badge badge-ai">⚡ Google Gemini AI x Vercel Python Serverless</div>
+        <h2>AI 스쿼시 코칭 &amp; 스탯 분석 스튜디오</h2>
+        <p>임의의 두 선수를 매칭하고 스코어와 경기 메모를 입력하여 AI 코칭 리포트 및 양 선수 6축 스탯 변동을 시뮬레이션할 수 있습니다.</p>
+      </div>
+
+      <div class="ai-studio-grid">
+        <div class="ai-form-card">
+          <h3>📝 경기 결과 &amp; 현장 관찰 메모</h3>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="ai-player-a">선수 A</label>
+              <select id="ai-player-a" class="form-control"></select>
+            </div>
+            <div class="form-group">
+              <label for="ai-player-b">선수 B</label>
+              <select id="ai-player-b" class="form-control"></select>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="ai-score-a">선수 A 득점</label>
+              <input type="number" id="ai-score-a" class="form-control" value="15" min="0" max="30" />
+            </div>
+            <div class="form-group">
+              <label for="ai-score-b">선수 B 득점</label>
+              <input type="number" id="ai-score-b" class="form-control" value="12" min="0" max="30" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="label-with-hint">
+              <label for="ai-match-memo">현장 경기 메모 (선택 입력)</label>
+              <span class="char-count" id="memo-char-count">0 / 500자</span>
+            </div>
+            <textarea id="ai-match-memo" class="form-control textarea" rows="4" placeholder="예: 앞볼 드롭과 T존 선점에서 우세, 강한 킬샷으로 득점 성공. 상대는 백코너 수비 실수가 잦았음."></textarea>
+          </div>
+
+          <div class="sample-chips">
+            <span class="sample-lbl">💡 빠른 예시 입력:</span>
+            <button type="button" class="chip-btn" onclick="fillSampleMemo(1)">앞볼 드롭 &amp; 킬샷 우세</button>
+            <button type="button" class="chip-btn" onclick="fillSampleMemo(2)">사이드 드라이브 렝스</button>
+            <button type="button" class="chip-btn" onclick="fillSampleMemo(3)">팽팽한 접전 &amp; 틴 범실</button>
+          </div>
+
+          <button type="button" id="ai-submit-btn" class="btn btn-ai-submit btn-block">
+            <span class="btn-text">✨ Gemini AI 코칭 분석 실행하기</span>
+            <span class="spinner hidden" id="ai-spinner"></span>
+          </button>
+
+          <div id="ai-error-alert" class="alert-banner alert-danger hidden">
+            <span class="alert-icon">⚠️</span>
+            <span id="ai-error-text"></span>
+          </div>
+        </div>
+
+        <div class="ai-result-card" id="ai-result-panel">
+          <div class="result-placeholder" id="ai-result-empty">
+            <span class="placeholder-icon">🎾</span>
+            <h4>AI 코칭 분석 결과가 여기에 표시됩니다</h4>
+            <p>좌측에서 경기 정보와 관찰 메모를 입력하고 분석 버튼을 눌러주세요.</p>
+          </div>
+
+          <div class="result-content hidden" id="ai-result-content">
+            <div class="result-header">
+              <div>
+                <span class="badge badge-emerald" id="res-model-badge">Google Gemini AI</span>
+                <h3 id="res-title">경기 코칭 분석 리포트</h3>
+              </div>
+              <button type="button" class="btn btn-sm btn-secondary" onclick="applyAiStatsToPlayer()">📊 선수 스탯에 반영하기</button>
+            </div>
+
+            <div class="report-box summary-box">
+              <h4>📋 경기 총평</h4>
+              <p id="res-summary"></p>
+            </div>
+
+            <div class="two-col-report">
+              <div class="report-box strengths-box">
+                <h4>⚡ 승자 분석</h4>
+                <p id="res-strengths"></p>
+              </div>
+              <div class="report-box improvements-box">
+                <h4>⚠️ 패자 분석</h4>
+                <p id="res-improvements"></p>
+              </div>
+            </div>
+
+            <div class="report-box drills-box">
+              <h4>🎯 추천 맞춤형 훈련 드릴</h4>
+              <ul id="res-drills-list"></ul>
+            </div>
+
+            <div class="report-box stat-diff-box">
+              <h4>📈 선수 A 6대 스탯 변동치 제안</h4>
+              <div class="stat-diff-grid" id="res-stat-adjustments"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 6: 운영진 데스크 (Admin) -->
+    <section id="tab-admin" class="tab-pane">
+      <div class="section-title-wrap">
+        <div>
+          <h2>운영진 전용 관리 데스크</h2>
+          <p>새 대진 등록, 경기 결과 확정, 데이터 백업/복원 및 단톡방 공지를 관리합니다.</p>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <div class="panel-card" id="admin-auth-card">
+          <div class="auth-icon">🔒</div>
+          <h3>운영진 PIN 인증</h3>
+          <p class="auth-desc">운영진 전용 비밀번호를 입력하세요.</p>
+          <div class="form-group">
+            <input type="password" id="admin-pin-input" class="form-control text-center tracking-widest" maxlength="4" placeholder="PIN 4자리 입력" />
+          </div>
+          <button type="button" id="admin-login-btn" class="btn btn-primary btn-block">운영진 인증하기</button>
+          <p class="pin-hint">※ 기본 PIN: <code>1234</code> (마스터 리셋 코드: <code>0101</code> 입력 시 1234로 초기화)</p>
+        </div>
+
+        <div class="admin-workspace hidden" id="admin-workspace">
+          <div class="admin-actions-bar">
+            <span class="auth-status">✅ 운영진 인증 완료</span>
+            <button type="button" class="btn btn-sm btn-danger" onclick="logoutAdmin()">로그아웃</button>
+          </div>
+
+          <div class="two-col-grid">
+            <div class="panel-card">
+              <h3>🛡️ 비상 안전망 &amp; 1초 롤백 복구</h3>
+              <p class="card-desc">실수로 경기를 삭제하거나 수정하더라도 1초 만에 직전 상태로 복원합니다.</p>
+              
+              <div class="btn-stack">
+                <button type="button" class="btn btn-warning btn-block" onclick="undoRollback()">⏪ 직전 상태로 1초 롤백 복구 (Undo)</button>
+                <button type="button" class="btn btn-secondary btn-block" onclick="exportDataJSON()">💾 전체 데이터 JSON 백업 다운로드</button>
+                <label class="btn btn-outline btn-block file-label">
+                  📂 JSON 백업 파일로 복원하기
+                  <input type="file" id="import-json-file" accept=".json" class="hidden" onchange="importDataJSON(event)" />
+                </label>
+              </div>
+            </div>
+
+            <div class="panel-card">
+              <h3>📋 단톡방 카카오톡 공지 포맷</h3>
+              <p class="card-desc">오늘의 경기 대진 및 심판 배정을 카톡 공지용 텍스트로 1초 만에 복사합니다.</p>
+              
+              <textarea id="kakao-notice-text" class="form-control textarea" rows="5" readonly></textarea>
+              <button type="button" class="btn btn-primary btn-block" onclick="copyKakaoNotice()">📋 카카오톡 공지 클립보드 복사</button>
+            </div>
+          </div>
+
+          <div class="panel-card mt-4">
+            <h3>➕ 신규 경기 대진 수동 추가</h3>
+            <div class="form-row-4">
+              <div class="form-group">
+                <label for="adm-player-a">선수 A</label>
+                <select id="adm-player-a" class="form-control"></select>
+              </div>
+              <div class="form-group">
+                <label for="adm-player-b">선수 B</label>
+                <select id="adm-player-b" class="form-control"></select>
+              </div>
+              <div class="form-group">
+                <label for="adm-court">코트</label>
+                <select id="adm-court" class="form-control">
+                  <option value="코트 1">코트 1</option>
+                  <option value="코트 2">코트 2</option>
+                  <option value="코트 3">코트 3</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="adm-date">날짜</label>
+                <input type="date" id="adm-date" class="form-control" />
+              </div>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="addManualMatch()">➕ 대진 등록하기</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MATCH RESULT INPUT MODAL (In-Card Action Modal) -->
+  <div id="match-modal-overlay" class="modal-overlay hidden">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <span class="modal-tag" id="modal-court-info">코트 1 · 정기전</span>
+          <h3 id="modal-match-title">[E1] 임영현 vs 조기호</h3>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeMatchInputModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-desc">세트 점수와 현장 메모(선택)를 입력해주세요. AI가 두 선수의 경기 내용을 자동 분석하여 실시간 스탯과 맞춤 드릴을 산출합니다.</p>
+
+        <div class="form-row-2" style="margin-bottom: 1rem;">
+          <div class="form-group">
+            <label id="modal-label-a">선수 A 득점</label>
+            <input type="number" id="modal-score-a" class="form-control text-center" style="font-size: 1.25rem; font-weight: 800;" value="15" min="0" max="30" />
+          </div>
+          <div class="form-group">
+            <label id="modal-label-b">선수 B 득점</label>
+            <input type="number" id="modal-score-b" class="form-control text-center" style="font-size: 1.25rem; font-weight: 800;" value="12" min="0" max="30" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="label-with-hint">
+            <label for="modal-memo">경기 특이사항 &amp; 관찰 메모 (선택 사항)</label>
+            <span class="char-count" id="modal-char-count">0 / 500자</span>
+          </div>
+          <textarea id="modal-memo" class="form-control textarea" rows="3" placeholder="예: 앞볼 드롭과 T존 선점에서 우세, 강한 킬샷 성공. 상대는 백코너 수비 실수가 잦았음."></textarea>
+        </div>
+
+        <div class="sample-chips" style="margin-bottom: 1rem;">
+          <span class="sample-lbl">💡 빠른 예시 문구 입력:</span>
+          <button type="button" class="chip-btn" onclick="fillModalSampleMemo(1)">앞볼 드롭 &amp; 킬샷 우세</button>
+          <button type="button" class="chip-btn" onclick="fillModalSampleMemo(2)">사이드 드라이브 렝스</button>
+          <button type="button" class="chip-btn" onclick="fillModalSampleMemo(3)">접전 &amp; 체력 우세</button>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeMatchInputModal()">취소</button>
+        <button type="button" id="modal-submit-btn" class="btn btn-ai-submit" onclick="submitMatchResultFromModal()">
+          <span>✨ 결과 확정 및 AI 스탯 반영</span>
+          <span class="spinner hidden" id="modal-spinner"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <strong>ENTHES Squash League Management System (2026 H2)</strong>
+        <p>순수 바닐라 HTML/CSS/JS + Vercel Python Serverless Functions + Google Gemini AI</p>
+      </div>
+      <div class="footer-right">
+        <span>🔒 환경 변수 <code>GEMINI_API_KEY</code> 격리 · 33인 E1·E2·E3 리그 정규 체제</span>
+        <span>배포 URL: <a href="https://enthes-private.vercel.app" target="_blank" style="color:var(--brand-emerald); text-decoration: underline;">https://enthes-private.vercel.app</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Embedded Official Datasets -->
+  <script src="assets/data/embedded_data.js"></script>
+  <!-- Main Script -->
+  <script src="app.js"></script>
+</body>
+</html>
